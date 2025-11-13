@@ -87,13 +87,12 @@ root_agent = SequentialAgent(
     sub_agents=[initial_writer_agent, story_refinement_loop],
 )
 
-
 '''
 runner = InMemoryRunner(agent=root_agent)
 #session = runner.session
 async def main():
     result = await runner.run_debug(
-       "Run the daily executive briefing on Tech, Health, and Finance"
+       "Write a short story about a lighthouse keeper who discovers a mysterious, glowing map"
     )
     return result
 
