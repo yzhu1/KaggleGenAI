@@ -4,26 +4,24 @@ from google.adk.tools import AgentTool, FunctionTool, google_search
 from google.genai import types
 from google.adk.runners import InMemoryRunner
 import asyncio
-from dotenv import load_dotenv
+import sys
 import os
+from dotenv import load_dotenv
 
-
+# Load .env file from the current agent's directory
 load_dotenv()
-# Access the variable
 api_key = os.environ["GOOGLE_API_KEY"]
 
-retry_config=types.HttpRetryOptions(
-    attempts=5,  # Maximum retry attempts
-    exp_base=7,  # Delay multiplier
-    initial_delay=1,
-    http_status_codes=[429, 500, 503, 504], # Retry on these HTTP errors
-)
+# Import shared configuration
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import retry_config
 
 # Tech Researcher: Focuses on AI and ML trends.
 tech_researcher = Agent(
     name="TechResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""Research the latest AI/ML trends. Include 3 key developments,
@@ -37,6 +35,7 @@ health_researcher = Agent(
     name="HealthResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""Research recent medical breakthroughs. Include 3 significant advances,
@@ -50,6 +49,7 @@ finance_researcher = Agent(
     name="FinanceResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""Research current fintech trends. Include 3 key trends,
@@ -63,6 +63,7 @@ aggregator_agent = Agent(
     name="AggregatorAgent",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     # It uses placeholders to inject the outputs from the parallel agents, which are now in the session state.

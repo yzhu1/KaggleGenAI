@@ -4,26 +4,24 @@ from google.adk.tools import AgentTool, FunctionTool, google_search
 from google.genai import types
 from google.adk.runners import InMemoryRunner
 import asyncio
-from dotenv import load_dotenv
+import sys
 import os
+from dotenv import load_dotenv
 
-
+# Load .env file from the current agent's directory
 load_dotenv()
-# Access the variable
 api_key = os.environ["GOOGLE_API_KEY"]
 
-retry_config=types.HttpRetryOptions(
-    attempts=5,  # Maximum retry attempts
-    exp_base=7,  # Delay multiplier
-    initial_delay=1,
-    http_status_codes=[429, 500, 503, 504], # Retry on these HTTP errors
-)
+# Import shared configuration
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import retry_config
 
 # This agent runs ONCE at the beginning to create the first draft.
 initial_writer_agent = Agent(
     name="InitialWriterAgent",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""Based on the user's prompt, write the first draft of a short story (around 100-150 words).
@@ -36,6 +34,7 @@ critic_agent = Agent(
     name="CriticAgent",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""You are a constructive story critic. Review the story provided below.
@@ -58,6 +57,7 @@ refiner_agent = Agent(
     name="RefinerAgent",
     model=Gemini(
         model="gemini-2.5-flash-lite",
+        api_key=api_key,
         retry_options=retry_config
     ),
     instruction="""You are a story refiner. You have a story draft and critique.
@@ -87,8 +87,8 @@ root_agent = SequentialAgent(
     sub_agents=[initial_writer_agent, story_refinement_loop],
 )
 
-'''
-runner = InMemoryRunner(agent=root_agent)
+
+""" runner = InMemoryRunner(agent=root_agent)
 #session = runner.session
 async def main():
     result = await runner.run_debug(
@@ -96,5 +96,4 @@ async def main():
     )
     return result
 
-result = asyncio.run(main())
-'''
+result = asyncio.run(main()) """

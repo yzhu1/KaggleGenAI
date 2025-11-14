@@ -4,20 +4,17 @@ from google.adk.tools import AgentTool, FunctionTool, google_search
 from google.genai import types
 from google.adk.runners import InMemoryRunner
 import asyncio
-from dotenv import load_dotenv
+import sys
 import os
+from dotenv import load_dotenv
 
-
+# Load .env file from the current agent's directory
 load_dotenv()
-# Access the variable
 api_key = os.environ["GOOGLE_API_KEY"]
 
-retry_config=types.HttpRetryOptions(
-    attempts=5,  # Maximum retry attempts
-    exp_base=7,  # Delay multiplier
-    initial_delay=1,
-    http_status_codes=[429, 500, 503, 504], # Retry on these HTTP errors
-)
+# Import shared configuration
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import retry_config
 
 # Research Agent: Its job is to use the google_search tool and present findings.
 research_agent = Agent(
@@ -62,8 +59,8 @@ root_agent = Agent(
     tools=[AgentTool(research_agent), AgentTool(summarizer_agent)],
 )
 
-'''
-runner = InMemoryRunner(agent=root_agent)
+
+""" runner = InMemoryRunner(agent=root_agent)
 #session = runner.session
 async def main():
     result = await runner.run_debug(
@@ -71,5 +68,4 @@ async def main():
     )
     return result
 
-result = asyncio.run(main())
-'''
+result = asyncio.run(main()) """
