@@ -1,3 +1,9 @@
+"""
+Day 1a
+https://www.kaggle.com/code/yanzhuyanzhu/day-1b-agent-architectures/
+
+Multi-Agent: Research & Summarization System
+"""
 from google.adk.agents import Agent, SequentialAgent, ParallelAgent, LoopAgent
 from google.adk.models.google_llm import Gemini
 from google.adk.tools import AgentTool, FunctionTool, google_search
@@ -11,6 +17,7 @@ from dotenv import load_dotenv
 # Load .env file from the current agent's directory
 load_dotenv()
 api_key = os.environ["GOOGLE_API_KEY"]
+model = os.environ["MODEL"]
 
 # Import shared configuration
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,7 +27,7 @@ from config import retry_config
 research_agent = Agent(
     name="ResearchAgent",
     model=Gemini(
-        model="gemini-2.5-flash-lite",
+        model=model,
         api_key=api_key,  # Replace with your actual API key
         retry_options=retry_config
     ),
@@ -33,7 +40,7 @@ research_agent = Agent(
 summarizer_agent = Agent(
     name="SummarizerAgent",
     model=Gemini(
-        model="gemini-2.5-flash-lite",
+        model=model,
         api_key=api_key,  # Replace with your actual API key
         retry_options=retry_config
     ),
@@ -46,7 +53,7 @@ summarizer_agent = Agent(
 root_agent = Agent(
     name="ResearchCoordinator",
     model=Gemini(
-        model="gemini-2.5-flash-lite",
+        model=model,
         api_key=api_key,  # Replace with your actual API key
         retry_options=retry_config
     ),
@@ -60,19 +67,17 @@ root_agent = Agent(
 )
 
 
-""" runner = InMemoryRunner(agent=root_agent)
-#session = runner.session
-async def main():
-    result = await runner.run_debug(
-        "What are the latest advancements in mathematics?"
-    )
-    return result
+# runner = InMemoryRunner(agent=root_agent)
+# #session = runner.session
+# async def main():
+#     result = await runner.run_debug(
+#         "What are the latest advancements in mathematics?"
+#     )
+#     return result
 
-result = asyncio.run(main())
+# result = asyncio.run(main())
 
-'''
-#print("Research Findings:", session.state.get("research_findings"))
-#print("Final Summary:", session.state.get("final_summary"))
-'''
 
-print(result) """
+# print("Research Findings:", session.state.get("research_findings"))
+# print("Final Summary:", session.state.get("final_summary"))
+# print(result)

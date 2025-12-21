@@ -1,3 +1,10 @@
+"""
+Day 1b
+Section 5: Loop Workflows - The Refinement Cycle
+https://www.kaggle.com/code/kaggle5daysofai/day-1b-agent-architectures
+
+Iterative Story Refinement
+"""
 from google.adk.agents import Agent, SequentialAgent, ParallelAgent, LoopAgent
 from google.adk.models.google_llm import Gemini
 from google.adk.tools import AgentTool, FunctionTool, google_search
@@ -88,12 +95,12 @@ root_agent = SequentialAgent(
 )
 
 
-""" runner = InMemoryRunner(agent=root_agent)
-#session = runner.session
-async def main():
-    result = await runner.run_debug(
-       "Write a short story about a lighthouse keeper who discovers a mysterious, glowing map"
-    )
-    return result
+# runner = InMemoryRunner(agent=root_agent)
+# #session = runner.session
+# async def main():
+#     result = await runner.run_debug(
+#        "Write a short story about a lighthouse keeper who discovers a mysterious, glowing map"
+#     )
+#     return result
 
-result = asyncio.run(main()) """
+# result = asyncio.run(main()) 

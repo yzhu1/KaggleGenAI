@@ -1,3 +1,8 @@
+"""
+Day 2a - Agent Tools
+https://www.kaggle.com/code/kaggle5daysofai/day-2a-agent-tools
+Building Custom Function Tools & Improving Agent Reliability with Code
+"""
 from google.genai import types
 
 from google.adk.agents import LlmAgent

@@ -1,3 +1,7 @@
+"""
+Day 1a - From Prompt to Action
+https://www.kaggle.com/code/kaggle5daysofai/day-1a-from-prompt-to-action
+"""
 from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
 from google.adk.runners import InMemoryRunner
@@ -29,12 +33,11 @@ root_agent = Agent(
     tools=[google_search],
 )
 
-""" runner = InMemoryRunner(agent=root_agent)
-#session = runner.session
-async def main():
-    result = await runner.run_debug(
-       "Who is Elon Musk?"
-    )
-    return result
+# runner = InMemoryRunner(agent=root_agent)
+# async def main():
+#     result = await runner.run_debug(
+#        "Who is Elon Musk?"
+#     )
+#     return result
 
-result = asyncio.run(main()) """
+# result = asyncio.run(main())

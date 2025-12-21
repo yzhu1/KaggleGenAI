@@ -1,3 +1,11 @@
+"""
+Day 1b
+Section 4: Parallel Workflows - Independent Researchers
+https://www.kaggle.com/code/kaggle5daysofai/day-1b-agent-architectures
+
+Parallel Multi-Topic Research
+"""
+
 from google.adk.agents import Agent, SequentialAgent, ParallelAgent, LoopAgent
 from google.adk.models.google_llm import Gemini
 from google.adk.tools import AgentTool, FunctionTool, google_search
@@ -16,56 +24,91 @@ api_key = os.environ["GOOGLE_API_KEY"]
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import retry_config
 
-# Research Agent: Its job is to use the google_search tool and present findings.
-research_agent = Agent(
-    name="ResearchAgent",
+# Tech Researcher: Focuses on AI and ML trends.
+tech_researcher = Agent(
+    name="TechResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
-        api_key=api_key,  # Replace with your actual API key
+        api_key=api_key,
         retry_options=retry_config
     ),
-    instruction="""You are a specialized research agent. Your only job is to use the google_search tool to find 2-3 pieces of relevant information on the given topic and present the findings with citations.""",
+    instruction="""Research the latest AI/ML trends. Include 3 key developments,
+the main companies involved, and the potential impact. Keep the report very concise (100 words).""",
     tools=[google_search],
-    output_key="research_findings",  # The result of this agent will be stored in the session state with this key.
+    output_key="tech_research",  # The result of this agent will be stored in the session state with this key.
 )
 
-# Summarizer Agent: Its job is to summarize the text it receives.
-summarizer_agent = Agent(
-    name="SummarizerAgent",
+# Health Researcher: Focuses on medical breakthroughs.
+health_researcher = Agent(
+    name="HealthResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
-        api_key=api_key,  # Replace with your actual API key
+        api_key=api_key,
         retry_options=retry_config
     ),
-    # The instruction is modified to request a bulleted list for a clear output format.
-    instruction="""Read the provided research findings: {research_findings}.Create a concise summary as a bulleted list with 3-5 key points.""",
-    output_key="final_summary",
+    instruction="""Research recent medical breakthroughs. Include 3 significant advances,
+their practical applications, and estimated timelines. Keep the report concise (100 words).""",
+    tools=[google_search],
+    output_key="health_research",  # The result will be stored with this key.
 )
 
-# Root Coordinator: Orchestrates the workflow by calling the sub-agents as tools.
-root_agent = Agent(
-    name="ResearchCoordinator",
+# Finance Researcher: Focuses on fintech trends.
+finance_researcher = Agent(
+    name="FinanceResearcher",
     model=Gemini(
         model="gemini-2.5-flash-lite",
-        api_key=api_key,  # Replace with your actual API key
+        api_key=api_key,
         retry_options=retry_config
     ),
-    # This instruction tells the root agent HOW to use its tools (which are the other agents).
-    instruction="""You are a research coordinator. Your goal is to answer the user's query by orchestrating a workflow.
-1. First, you MUST call the `ResearchAgent` tool to find relevant information on the topic provided by the user.
-2. Next, after receiving the research findings, you MUST call the `SummarizerAgent` tool to create a concise summary.
-3. Finally, present the final summary clearly to the user as your response.""",
-    # We wrap the sub-agents in `AgentTool` to make them callable tools for the root agent.
-    tools=[AgentTool(research_agent), AgentTool(summarizer_agent)],
+    instruction="""Research current fintech trends. Include 3 key trends,
+their market implications, and the future outlook. Keep the report concise (100 words).""",
+    tools=[google_search],
+    output_key="finance_research",  # The result will be stored with this key.
+)
+
+# The AggregatorAgent runs *after* the parallel step to synthesize the results.
+aggregator_agent = Agent(
+    name="AggregatorAgent",
+    model=Gemini(
+        model="gemini-2.5-flash-lite",
+        api_key=api_key,
+        retry_options=retry_config
+    ),
+    # It uses placeholders to inject the outputs from the parallel agents, which are now in the session state.
+    instruction="""Combine these three research findings into a single executive summary:
+
+    **Technology Trends:**
+    {tech_research}
+    
+    **Health Breakthroughs:**
+    {health_research}
+    
+    **Finance Innovations:**
+    {finance_research}
+    
+    Your summary should highlight common themes, surprising connections, and the most important key takeaways from all three reports. The final summary should be around 200 words.""",
+    output_key="executive_summary",  # This will be the final output of the entire system.
+)
+
+# The ParallelAgent runs all its sub-agents simultaneously.
+parallel_research_team = ParallelAgent(
+    name="ParallelResearchTeam",
+    sub_agents=[tech_researcher, health_researcher, finance_researcher],
+)
+
+# This SequentialAgent defines the high-level workflow: run the parallel team first, then run the aggregator.
+root_agent = SequentialAgent(
+    name="ResearchSystem",
+    sub_agents=[parallel_research_team, aggregator_agent],
 )
 
 
-""" runner = InMemoryRunner(agent=root_agent)
-#session = runner.session
-async def main():
-    result = await runner.run_debug(
-        "What are the latest advancements in quantum computing?"
-    )
-    return result
+# runner = InMemoryRunner(agent=root_agent)
+# #session = runner.session
+# async def main():
+#     result = await runner.run_debug(
+#        "Run the daily executive briefing on Tech, Health, and Finance"
+#     )
+#     return result
 
-result = asyncio.run(main()) """
+# result = asyncio.run(main())
