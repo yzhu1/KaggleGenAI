@@ -17,6 +17,18 @@ import sys
 import os
 from dotenv import load_dotenv
 
+import logging
+
+class _NoFunctionCallWarning(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        if "there are non-text parts in the response:" in message:
+            return False
+        else:
+            return True
+
+logging.getLogger("google_genai.types").addFilter(_NoFunctionCallWarning())
+
 # Load .env file from the current agent's directory
 load_dotenv()
 api_key = os.environ["GOOGLE_API_KEY"]
@@ -61,7 +73,6 @@ def get_fee_for_payment_method(method: str) -> dict:
         Success: {"status": "success", "fee_percentage": 0.02}
         Error: {"status": "error", "error_message": "Payment method not found"}
     """
-    print(f"=========Looking up fee for payment method: {method}")
     # This simulates looking up a company's internal fee structure.
     fee_database = {
         "platinum credit card": 0.02,  # 2%
@@ -71,6 +82,7 @@ def get_fee_for_payment_method(method: str) -> dict:
 
     fee = fee_database.get(method.lower())
     if fee is not None:
+        print(f"========= Found fee for payment method: {method}: {fee}")
         return {"status": "success", "fee_percentage": fee}
     else:
         return {
@@ -93,8 +105,6 @@ def get_exchange_rate(base_currency: str, target_currency: str) -> dict:
         Error: {"status": "error", "error_message": "Unsupported currency pair"}
     """
 
-    print(f"=========Looking up exchange rate from {base_currency} to {target_currency}")
-
     # Static data simulating a live exchange rate API
     # In production, this would call something like: requests.get("api.exchangerates.com")
     rate_database = {
@@ -112,6 +122,7 @@ def get_exchange_rate(base_currency: str, target_currency: str) -> dict:
     # Return structured result with status
     rate = rate_database.get(base, {}).get(target)
     if rate is not None:
+        print(f"========= Found exchange rate from {base_currency} to {target_currency}: {rate}")
         return {"status": "success", "rate": rate}
     else:
         return {
@@ -204,6 +215,7 @@ async def main():
     result = await enhanced_runner.run_debug(
        "Convert 1,250 USD to INR using a Bank Transfer. Show me the precise calculation."
     )
+    show_python_code_and_result(result)
     return result
 
 result = asyncio.run(main())
