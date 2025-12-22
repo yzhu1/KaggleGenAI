@@ -14,6 +14,7 @@ import asyncio
 import sys
 import os
 from dotenv import load_dotenv
+import logging
 
 # Load .env file from the current agent's directory
 load_dotenv()
@@ -21,7 +22,9 @@ api_key = os.environ["GOOGLE_API_KEY"]
 
 # Import shared configuration
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import retry_config
+from config import retry_config, _NoFunctionCallWarning
+
+logging.getLogger("google_genai.types").addFilter(_NoFunctionCallWarning())
 
 # This agent runs ONCE at the beginning to create the first draft.
 initial_writer_agent = Agent(

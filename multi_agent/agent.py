@@ -13,6 +13,7 @@ import asyncio
 import sys
 import os
 from dotenv import load_dotenv
+import logging
 
 # Load .env file from the current agent's directory
 load_dotenv()
@@ -21,7 +22,9 @@ model = os.environ["MODEL"]
 
 # Import shared configuration
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import retry_config
+from config import retry_config, _NoFunctionCallWarning
+
+logging.getLogger("google_genai.types").addFilter(_NoFunctionCallWarning())
 
 # Research Agent: Its job is to use the google_search tool and present findings.
 research_agent = Agent(
