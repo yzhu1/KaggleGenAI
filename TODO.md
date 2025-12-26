@@ -1,6 +1,6 @@
 - [ ] share google API key
-- [ ] print python code gen.ed in tools agent
-- [ ] why tools agent calculation is wrong even with python code
-- [ ] remove user warning (option: warnings.filterwarnings("ignore"))
+- [x] print python code gen.ed in tools agent
+- [x] why tools agent calculation is wrong even with python code
+- [x] remove user warning (option: warnings.filterwarnings("ignore"))
 - [ ] 4b Section 5: User Simulation
 - [ ] Can I rename agent.py?x
